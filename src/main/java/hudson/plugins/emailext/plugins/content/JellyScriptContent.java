@@ -45,23 +45,12 @@ public class JellyScriptContent extends AbstractEvalContent {
 
     @Override
     public String evaluate(@NonNull Run<?, ?> run, FilePath workspace, @NonNull TaskListener listener, String macroName) throws MacroEvaluationException, IOException, InterruptedException {
-        InputStream inputStream = null;
-
-        try {
-            inputStream = getFileInputStream(run, workspace, template, JELLY_EXTENSION);
+        try (InputStream inputStream = getFileInputStream(run, workspace, template, JELLY_EXTENSION)) {
             return renderContent(run, inputStream, listener);
         } catch (JellyException e) {
             return "JellyException: " + e.getMessage();
         } catch (FileNotFoundException e) {
             return generateMissingFile("Jelly", template);
-        } finally {
-            try {
-                if (inputStream != null) {
-                    inputStream.close();
-                }
-            } catch (IOException e) {
-                // ignore
-            }
         }
     }
 
